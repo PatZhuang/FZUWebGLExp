@@ -326,7 +326,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-			if ( scope.object instanceof THREE.PerspectiveCamera ) {
+			if ( scope.object instanceof THREE.PerspectiveCamera) {
 
 				// perspective
 				var position = scope.object.position;

@@ -1,11 +1,11 @@
 var renderer;
 var scene;
 var camera;
-var lookAtScene = true;
+
 var lookAt = {
-    x: 0,
-    y: 0,
-    z: 0
+    x: 0.0,
+    y: 0.0,
+    z: 0.0
 };
 var rotateOnAxis = {
     x: false,
@@ -15,8 +15,11 @@ var rotateOnAxis = {
     yAngle: 0.0,
     zAngle: 0.0
 };
-var cameraRotateDirection;
-var cameraMoveDirection;
+var cameraRotateDirection = 'none';
+var cameraMoveDirection = 'none';
+var currentObject;
+var controls;
+
 var Params = function() {
     //camera position
     this.cameraPosX = camera.position.x;
@@ -26,7 +29,7 @@ var Params = function() {
     this.lookAtX = lookAt.x;
     this.lookAtY = lookAt.y;
     this.lookAtZ = lookAt.z;
-
+    //zoom factor
     this.fov = camera.fov;
     this.lens = camera.getFocalLength;
     //camera mode
@@ -34,8 +37,11 @@ var Params = function() {
     //zoom
     this.zoom = 1.0;
     //about rotation
-    this.cameraViews = 'default';
-    this.cameraRotation = 'default';
+    this.cameraAutoRotate = false;
+    this.cameraRotationSpeed = 2.0;
+    this.cameraRotateDirection = 'clockwise';
+    //models
+    this.obj = 'teapot';
 };
 var params;
 
@@ -52,6 +58,7 @@ function init() {
     //设置背景色为黑色, 设置画布大小
     renderer.setClearColor(0x000000);
     renderer.setSize(window.innerWidth, window.innerHeight);
+
     //创建辅助坐标轴
     var axisHelper = new THREE.AxisHelper(5000);
     //创建一个底板
@@ -61,10 +68,11 @@ function init() {
         color: 0xcccccc
     });
     var plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.receiveShadow = true;
+    //使底板旋转到 xz 平面
     plane.position.set(0, 0, 0);
     plane.rotation.x = -Math.PI / 2;
     scene.add(plane);
+
     //加载 mtl 文件
     var mtlLoader = new THREE.MTLLoader();
     mtlLoader.setPath('model/');
@@ -73,12 +81,10 @@ function init() {
         //加载 obj 文件
         var objLoader = new THREE.OBJLoader();
         objLoader.setMaterials(materials);
-        objLoader.setPath('model/');
-        objLoader.load('teapot.obj', function(object) {
+        objLoader.load('model/teapot.obj', function(object) {
             object.position.set(0, 0, 0);
             scene.add(object);
             object.receiveShadow = true;
-            // renderer.render(scene, camera);
             render();
         });
     });
@@ -92,14 +98,23 @@ function init() {
     spotLight.castShadow = true;
     scene.add(spotLight);
 
+    //使用 orbitcontrols 来控制相机的绕轴旋转
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 0, 0); //设置中心
+    controls.enableKeys = false; //由于要自己设置键盘事件所以屏蔽 controls 的事件
+    controls.addEventListener('change', function() {
+        updateCameraState();
+    });
+
     //改变窗口大小的时候改变相机和渲染器的大小
     window.addEventListener('resize', function() {
         camera.setSize(window.innerWidth, window.innerHeight);
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     }, false);
-
+    //键盘响应事件
     window.addEventListener('keydown', function(key) {
+        params.cameraAutoRotate = controls.autoRotate = false;
         switch (key.keyCode) {
             case 37: //左
                 cameraRotateDirection = 'left';
@@ -114,49 +129,78 @@ function init() {
                 cameraRotateDirection = 'down';
                 break;
             case 87: //W
-                cameraMoveDirection = 'forward';
+                cameraMoveDirection = 'up';
+                break;
+            case 65: //A
+                cameraMoveDirection = 'left';
                 break;
             case 83: //S
+                cameraMoveDirection = 'down';
+                break;
+            case 68: //D
+                cameraMoveDirection = 'right';
+                break;
+            case 70: //F
+                cameraMoveDirection = 'forward';
+                break;
+            case 66: //B
                 cameraMoveDirection = 'back';
                 break;
             default:
                 break;
         }
     });
+    //按键抬起的时候停止所有移动动作
     window.addEventListener('keyup', function() {
         cameraRotateDirection = 'none';
         cameraMoveDirection = 'none';
+        cameraRotateAroundZDirection = 'none';
+        controls.autoRotate = false;
     });
+    //鼠标滚轮事件
+    window.onmousewheel = document.onmousewheel = function(e) {
+        e = e || window.event;
+        if (e.wheelDelta) {
+            //对于 chrome
+            if (e.wheelDelta > 0) {
+                cameraMoveDirection = 'forward';
+            } else {
+                cameraMoveDirection = 'back';
+            }
+        } else if (e.detail) {
+            //对于 ff
+            if (e.detail > 0) {
+                cameraMoveDirection = 'forward';
+            } else {
+                cameraMoveDirection = 'back';
+            }
+        }
+    };
+
     //将渲染器对应的 dom 节点插入 html
     $("#WebGL").append(renderer.domElement);
     //初始化控制面板
     initDatGui();
-    //使用 orbitcontrols 来控制拖动旋转事件
-    var controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 0, 0);
-    controls.addEventListener('change', function() {
-        params.cameraPosX = camera.position.x;
-        params.cameraPosY = camera.position.y;
-        params.cameraPosZ = camera.position.z;
-        controls.update();
-    });
     //开始绘制
     render();
 }
 
 function render() {
     // render using requestAnimationFrame
-    // renderer.render(scene, camera);
-    var timer = Date.now() * 0.001;
-    var radius = 200;
-    if (lookAtScene) {
-        camera.lookAt(new THREE.Vector3(lookAt.x, lookAt.y, lookAt.z));
-    }
+    //是否旋转镜头
     if (cameraRotateDirection != "none") {
         rotateCamera(cameraRotateDirection);
     }
+    //是否移动镜头
     if (cameraMoveDirection != "none") {
-        moveCameraForwardBack(cameraMoveDirection);
+        moveCamera(cameraMoveDirection);
+        if (cameraMoveDirection == 'forward' || cameraMoveDirection == 'back') {
+            cameraMoveDirection = 'none';
+        }
+    }
+    if (controls.autoRotate) {
+        updateCameraState();
+        controls.update();
     }
     renderer.render(scene, camera);
     requestAnimationFrame(render);
@@ -167,13 +211,13 @@ function initDatGui() {
     var gui = new dat.GUI();
 
     var f1 = gui.addFolder('Camera Position');
-    f1.add(params, 'cameraPosX', -500, 500, 20).name('x').onChange(function(x) {
+    f1.add(params, 'cameraPosX', -500, 500, 10).name('x').onChange(function(x) {
         camera.position.x = x;
     }).listen();
-    f1.add(params, 'cameraPosY', -500, 500, 20).name('y').onChange(function(y) {
+    f1.add(params, 'cameraPosY', -500, 500, 10).name('y').onChange(function(y) {
         camera.position.y = y;
     }).listen();
-    f1.add(params, 'cameraPosZ', -500, 500, 20).name('z').onChange(function(z) {
+    f1.add(params, 'cameraPosZ', -500, 500, 10).name('z').onChange(function(z) {
         camera.position.z = z;
     }).listen();
     f1.open();
@@ -200,18 +244,38 @@ function initDatGui() {
     f3.add(params, 'zoom', 0.4, 3.0, 0.1).onChange(function(zoom) {
         camera.setZoom(zoom);
     });
-    f3.add(params, 'cameraMode', ['perspective', 'orthographic']).onFinishChange(function(mode) {
+    f3.open();
+
+    var f4 = gui.addFolder('rotation');
+    f4.add(params, 'cameraAutoRotate').name('auto rotation').onFinishChange(function(enable) {
+        if (enable) {
+            controls.autoRotate = true;
+        } else {
+            controls.autoRotate = false;
+        }
+    }).listen();
+    f4.add(params, 'cameraRotationSpeed', 0, 10, 1).name('rotation speed').onChange(function(speed) {
+        controls.autoRotateSpeed = params.cameraRotateDirection == 'clockwise'? Math.abs(speed) : -Math.abs(speed);
+    });
+    f4.add(params, 'cameraRotateDirection', ['clockwise', 'anticlockwise']).onFinishChange(function(direction) {
+        params.cameraRotateDirection = direction;
+        controls.autoRotateSpeed = direction == 'clockwise'? Math.abs(controls.autoRotateSpeed) : -Math.abs(controls.autoRotateSpeed);
+    });
+    f4.open();
+
+    var f5 = gui.addFolder('other');
+    f5.add(params, 'cameraMode', ['perspective', 'orthographic']).onFinishChange(function(mode) {
         if (mode == 'perspective') {
             camera.toPerspective();
         } else if (mode == 'orthographic') {
             camera.toOrthographic();
         }
     });
-    f3.open();
+    f5.open();
+
 }
 
 function rotateCamera(direction) {
-    lookAtScene = false;
     switch (direction) {
         case 'up':
             camera.rotateX(Math.PI / 200);
@@ -228,15 +292,34 @@ function rotateCamera(direction) {
         default:
             break;
     }
+    updateCameraState();
 }
 
-function moveCameraForwardBack(direction) {
-    if (direction == 'forward') {
-        camera.translateZ(-2);
-    } else if (direction == 'back') {
-        camera.translateZ(2);
-    }
+function updateCameraState() {
+    var vector = new THREE.Vector3();
+    camera.getWorldDirection(vector);
+    params.lookAtX = vector.x * 100;
+    params.lookAtY = vector.y * 100;
+    params.lookAtZ = vector.z * 100;
     params.cameraPosX = camera.position.x;
     params.cameraPosY = camera.position.y;
     params.cameraPosZ = camera.position.z;
+}
+
+function moveCamera(direction) {
+    if (direction == 'up') {
+        camera.translateY(2);
+    } else if (direction == 'down') {
+        camera.translateY(-2);
+    } else if (direction == 'left') {
+        camera.translateX(-2);
+    } else if (direction == 'right') {
+        camera.translateX(2);
+    } else if (direction == 'forward') {
+        camera.translateZ(-4);
+    } else if (direction == 'back') {
+        camera.translateZ(4);
+    }
+    updateCameraState();
+
 }
