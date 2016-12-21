@@ -10,6 +10,7 @@
         <script src="js/OBJLoader.js" charset="utf-8"></script>
         <script src="js/MTLLoader.js" charset="utf-8"></script>
         <script src="js/OrbitControls.js" charset="utf-8"></script>
+        <script src="js/PointerLockControls.js" charset="utf-8"></script>
         <script src="js/CombinedCamera.js" charset="utf-8"></script>
         <style>
             body {
@@ -22,7 +23,9 @@
         <div id="WebGL"></div>
         <script type="text/javascript">
             alert("方向键旋转相机镜头\n"+
-                "wasd移动相机\n\n"+
+                "WASD 移动相机\n"+
+                "Q/E 绕Y轴旋转相机\n"+
+                "滑轮或 F/B 前进后退相机\n\n"+
                 "由于 webgl 默认不允许加载本地纹理, 部分浏览器需要额外设置安全级或建立本地服务器运行本程序\n\n"+
                 "Chrome 需要加入启动参数 --allow-file-access-from-files\n");
         </script>
