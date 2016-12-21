@@ -241,9 +241,8 @@ function render() {
     }
     if (controls.autoRotate) {
         controls.update();
-        updateCameraState();
     }
-
+    updateCameraState();
     renderer.render(scene, camera);
     requestAnimationFrame(render);
 }
@@ -347,7 +346,6 @@ function rotateCamera(direction) {
         default:
             break;
     }
-    updateCameraState();
 }
 
 function updateCameraState() {
@@ -375,5 +373,4 @@ function moveCamera(direction) {
     } else if (direction == 'back') {
         camera.translateZ(params.zoomSpeed);
     }
-    updateCameraState();
 }
