@@ -135,7 +135,7 @@ function init() {
     //使用 orbitcontrols 来控制相机的绕轴旋转
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0, 0); //设置中心
-    // controls.enableKeys = false; //由于要自己设置键盘事件所以屏蔽 controls 的事件
+    controls.enableKeys = false; //由于要自己设置键盘事件所以屏蔽 controls 的事件
 
     //改变窗口大小的时候改变相机和渲染器的大小
     window.addEventListener('resize', function() {
