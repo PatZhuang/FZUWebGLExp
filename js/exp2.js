@@ -104,7 +104,7 @@ function init() {
     var material = new THREE.MeshPhongMaterial({
         color: 0xffffff,
     });
-    for (var i = 0; i < 3000; i++) {
+    for (var i = 0; i < 2000; i++) {
         var mesh = new THREE.Mesh(cube, material);
         mesh.position.x = 3000 * (2.0 * Math.random() - 1.0);
         mesh.position.y = 3000 * (2.0 * Math.random() - 1.0);
