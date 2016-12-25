@@ -48,7 +48,7 @@ var Params = function() {
     this.roamSpeed = 2;
     this.zoomSpeed = 10;
     //cube attributes
-    this.cubeColor = [255, 255, 255];
+    this.cubeColor = '#ffffff';
     this.cubeTexture = 'none';
 };
 var params;
@@ -325,9 +325,7 @@ function initDatGui() {
     var f6 = gui.addFolder('cube material');
     f6.addColor(params, 'cubeColor').onChange(function(color) {
         for (var i = 0; i < geos.length; i++) {
-            geos[i].material.setValues({
-                color: color
-            });
+            geos[i].material.setValues({color: color});
         }
         params.cubeColor = color;
     });
@@ -390,7 +388,7 @@ function initDatGui() {
     f6.open();
 
     var h, s, v, hsl;
-    var f7 = gui.addFolder('Point Light');
+    var f7 = gui.addFolder('point light');
     f7.add(pointLight, 'x', -2000, 2000, 50).onChange(function(x) {
         pointLight.x = x;
         lights[0].position.set(pointLight.x, pointLight.y, pointLight.z);
@@ -455,7 +453,7 @@ function initDatGui() {
     directionalLight.z = lights[2].position.z;
     directionalLight.color = [lights[2].color.r*255.0, lights[2].color.g*255.0, lights[2].color.b*255.0];
     f9.open();
-    
+
     var f5 = gui.addFolder('other');
     f5.add(params, 'roamSpeed', 0, 50, 1).onChange(function(speed) {
         params.roamSpeed = speed;
