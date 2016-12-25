@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 var renderer;
 var scene;
 var camera;
@@ -20,7 +21,8 @@ var cameraMoveDirection = 'none';
 var currentObject;
 var controls;
 var axisHelper;
-
+var geos = [];
+var lights = [];
 var Params = function() {
     //camera position
     this.cameraPosX = camera.position.x;
@@ -42,11 +44,21 @@ var Params = function() {
     this.cameraRotationSpeed = 2.0;
     this.cameraRotateDirection = 'clockwise';
     //show axisHelper
-    this.showAxis = true;
+    this.showAxis = false;
     this.roamSpeed = 2;
     this.zoomSpeed = 10;
+    //cube attributes
+    this.cubeColor = '#ffffff';
+    this.cubeTexture = 'none';
 };
 var params;
+var Light = function() {
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+    this.color = [0, 0, 0];
+};
+var spotLight, pointLight, directionalLight;
 
 function init() {
     //创建场景
@@ -69,19 +81,6 @@ function init() {
 
     //创建辅助坐标轴
     axisHelper = new THREE.AxisHelper(5000);
-    scene.add(axisHelper);
-    //创建一个底板
-    /*
-    var planeGeometry = new THREE.PlaneGeometry(260, 260, 1, 1);
-    var planeMaterial = new THREE.MeshBasicMaterial({
-        color: 0xcccccc
-    });
-    var plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    //使底板旋转到 xz 平面
-    plane.position.set(0, 0, 0);
-    plane.rotation.x = -Math.PI / 2;
-    scene.add(plane);
-    */
 
     //加载 mtl 文件
     var mtlLoader = new THREE.MTLLoader();
@@ -106,9 +105,10 @@ function init() {
     });
     for (var i = 0; i < 2000; i++) {
         var mesh = new THREE.Mesh(cube, material);
-        mesh.position.x = 3000 * (2.0 * Math.random() - 1.0);
-        mesh.position.y = 3000 * (2.0 * Math.random() - 1.0);
-        mesh.position.z = 3000 * (2.0 * Math.random() - 1.0);
+        geos[i] = mesh;
+        mesh.position.x = 2000 * (2.0 * Math.random() - 1.0);
+        mesh.position.y = 2000 * (2.0 * Math.random() - 1.0);
+        mesh.position.z = 2000 * (2.0 * Math.random() - 1.0);
         mesh.rotation.x = Math.random() * Math.PI;
         mesh.rotation.y = Math.random() * Math.PI;
         mesh.rotation.z = Math.random() * Math.PI;
@@ -120,17 +120,31 @@ function init() {
     //添加全局环境光
     var ambientLight = new THREE.AmbientLight("#8b8a87", 1.2);
     scene.add(ambientLight);
-    //为了增加阴影添加一个点光源
-    var spotLight = new THREE.SpotLight(0xffffff);
-    spotLight.decay = 2.0;
-    spotLight.position.set(-40, 60, -10);
-    spotLight.castShadow = true;
-    scene.add(spotLight);
 
-    var spotLight2 = new THREE.DirectionalLight(0x002244);
-    spotLight2.decay = 2.0;
-    spotLight2.position.set(-500, -500, -500);
-    scene.add(spotLight2);
+    // lights
+    lights[0] = addLight(13.0/255, 174.0/255, 243.0/255, 1000, 0, -200, 'PointLight');
+    lights[1] = addLight(230.0/255, 121.0/255, 26.0/255, 0, 0, -200, 'SpotLight');
+    lights[2] = addLight(192.0/255, 64.0/255, 68.0/255, 1000, 1000, -200, 'DirectionalLight');
+
+    function addLight(r, g, b, x, y, z, type) {
+        var light;
+        switch (type) {
+            case 'PointLight':
+                light = new THREE.PointLight(0xffffff, 1, 2000);
+                break;
+            case 'SpotLight':
+                light = new THREE.SpotLight(0xffffff);
+                break;
+            case 'DirectionalLight':
+                light = new THREE.DirectionalLight(0xffffff, 0.5);
+                break;
+            default:
+        }
+        light.color.setRGB(r, g, b);
+        light.position.set(x, y, z);
+        scene.add(light);
+        return light;
+    }
 
     //使用 orbitcontrols 来控制相机的绕轴旋转
     controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -251,32 +265,36 @@ function initDatGui() {
     params = new Params();
     var gui = new dat.GUI();
 
+    pointLight = new Light();
+    spotLight = new Light();
+    directionalLight = new Light();
+
     var f1 = gui.addFolder('Camera Position');
-    f1.add(params, 'cameraPosX', -500, 500, 10).name('x').onChange(function(x) {
+    f1.add(params, 'cameraPosX', -2000, 2000, 10).name('x').onChange(function(x) {
         camera.position.x = x;
     }).listen();
-    f1.add(params, 'cameraPosY', -500, 500, 10).name('y').onChange(function(y) {
+    f1.add(params, 'cameraPosY', -2000, 2000, 10).name('y').onChange(function(y) {
         camera.position.y = y;
     }).listen();
-    f1.add(params, 'cameraPosZ', -500, 500, 10).name('z').onChange(function(z) {
+    f1.add(params, 'cameraPosZ', -2000, 2000, 10).name('z').onChange(function(z) {
         camera.position.z = z;
     }).listen();
-    f1.open();
+    // f1.open();
 
     var f2 = gui.addFolder('Look At');
-    f2.add(params, 'lookAtX', -500, 500, 20).name('x').onChange(function(x) {
+    f2.add(params, 'lookAtX', -2000, 2000, 20).name('x').onChange(function(x) {
         lookAt.x = x;
         camera.lookAt(new THREE.Vector3(lookAt.x, lookAt.y, lookAt.z));
     }).listen();
-    f2.add(params, 'lookAtY', -500, 500, 20).name('y').onChange(function(y) {
+    f2.add(params, 'lookAtY', -2000, 2000, 20).name('y').onChange(function(y) {
         lookAt.y = y;
         camera.lookAt(new THREE.Vector3(lookAt.x, lookAt.y, lookAt.z));
     }).listen();
-    f2.add(params, 'lookAtZ', -500, 500, 20).name('z').onChange(function(z) {
+    f2.add(params, 'lookAtZ', -2000, 2000, 20).name('z').onChange(function(z) {
         lookAt.z = z;
         camera.lookAt(new THREE.Vector3(lookAt.x, lookAt.y, lookAt.z));
     }).listen();
-    f2.open();
+    // f2.open();
 
     var f3 = gui.addFolder('zoom');
     f3.add(params, 'fov', 30, 180, 10).onChange(function(fov) {
@@ -285,7 +303,7 @@ function initDatGui() {
     f3.add(params, 'zoom', 0.4, 3.0, 0.1).onChange(function(zoom) {
         camera.setZoom(zoom);
     });
-    f3.open();
+    // f3.open();
 
     var f4 = gui.addFolder('rotation');
     f4.add(params, 'cameraAutoRotate').name('auto rotation').onFinishChange(function(enable) {
@@ -302,13 +320,145 @@ function initDatGui() {
         params.cameraRotateDirection = direction;
         controls.autoRotateSpeed = direction == 'clockwise' ? Math.abs(controls.autoRotateSpeed) : -Math.abs(controls.autoRotateSpeed);
     });
-    f4.open();
+    // f4.open();
+
+    var f6 = gui.addFolder('cube material');
+    f6.addColor(params, 'cubeColor').onChange(function(color) {
+        for (var i = 0; i < geos.length; i++) {
+            geos[i].material.setValues({color: color});
+        }
+        params.cubeColor = color;
+    });
+    f6.add(params, 'cubeTexture', ['none', 'crate', 'roughness', 'disturb']).onFinishChange(function(texture) {
+        var loader = new THREE.TextureLoader();
+        switch (texture) {
+            case 'none':
+                var material = new THREE.MeshPhongMaterial({
+                    color: params.cubeColor
+                });
+                for (var i = 0; i < geos.length; i++) {
+                    geos[i].material = material;
+                }
+                break;
+            case 'crate':
+                loader.load(
+                    'textures/crate.gif',
+                    function(texture) {
+                        var material = new THREE.MeshPhongMaterial({
+                            color: params.cubeColor,
+                            map: texture
+                        });
+                        for (var i = 0; i < geos.length; i++) {
+                            geos[i].material = material;
+                        }
+                    }
+                );
+                break;
+            case 'roughness':
+                loader.load(
+                    'textures/roughness.jpg',
+                    function(texture) {
+                        var material = new THREE.MeshPhongMaterial({
+                            color: params.cubeColor,
+                            map: texture
+                        });
+                        for (var i = 0; i < geos.length; i++) {
+                            geos[i].material = material;
+                        }
+                    }
+                );
+                break;
+            case 'disturb':
+                loader.load(
+                    'textures/disturb.jpg',
+                    function(texture) {
+                        var material = new THREE.MeshPhongMaterial({
+                            map: texture
+                        });
+                        for (var i = 0; i < geos.length; i++) {
+                            geos[i].material = material;
+                        }
+                    }
+                );
+                break;
+            default:
+                break;
+        }
+    });
+    f6.open();
+
+    var h, s, v, hsl;
+    var f7 = gui.addFolder('point light');
+    f7.add(pointLight, 'x', -2000, 2000, 50).onChange(function(x) {
+        pointLight.x = x;
+        lights[0].position.set(pointLight.x, pointLight.y, pointLight.z);
+    }).listen();
+    f7.add(pointLight, 'y', -2000, 2000, 50).onChange(function(y) {
+        pointLight.y = y;
+        lights[0].position.set(pointLight.x, pointLight.y, pointLight.z);
+    }).listen();
+    f7.add(pointLight, 'z', -2000, 2000, 50).onChange(function(z) {
+        pointLight.z = z;
+        lights[0].position.set(pointLight.x, pointLight.y, pointLight.z);
+    }).listen();
+    f7.addColor(pointLight, 'color').onChange(function(color) {
+        lights[0].color.setRGB(color[0]/255.0, color[1]/255.0, color[2]/255.0);
+    }).listen();
+    pointLight.x = lights[0].position.x;
+    pointLight.y = lights[0].position.y;
+    pointLight.z = lights[0].position.z;
+    pointLight.color = [lights[0].color.r*255.0, lights[0].color.g*255.0, lights[0].color.b*255.0];
+    f7.open();
+
+    var f8 = gui.addFolder('spot light');
+    f8.add(spotLight, 'x', -2000, 2000, 50).onChange(function(x) {
+        spotLight.x = x;
+        lights[1].position.set(spotLight.x, spotLight.y, spotLight.z);
+    }).listen();
+    f8.add(spotLight, 'y', -2000, 2000, 50).onChange(function(y) {
+        spotLight.y = y;
+        lights[1].position.set(spotLight.x, spotLight.y, spotLight.z);
+    }).listen();
+    f8.add(spotLight, 'z', -2000, 2000, 50).onChange(function(z) {
+        spotLight.z = z;
+        lights[1].position.set(spotLight.x, spotLight.y, spotLight.z);
+    }).listen();
+    f8.addColor(spotLight, 'color').onChange(function (color) {
+        lights[1].color.setRGB(color[0]/255.0, color[1]/255.0, color[2]/255.0);
+    }).listen();
+    spotLight.x = lights[1].position.x;
+    spotLight.y = lights[1].position.y;
+    spotLight.z = lights[1].position.z;
+    spotLight.color = [lights[1].color.r*255.0, lights[1].color.g*255.0, lights[1].color.b*255.0];
+    f8.open();
+
+    var f9 = gui.addFolder('directional light');
+    f9.add(directionalLight, 'x', -2000, 2000, 50).onChange(function(x) {
+        directionalLight.x = x;
+        lights[2].position.set(directionalLight.x, directionalLight.y, directionalLight.z);
+    }).listen();
+    f9.add(directionalLight, 'y', -2000, 2000, 50).onChange(function(y) {
+        directionalLight.y = y;
+        lights[2].position.set(directionalLight.x, directionalLight.y, directionalLight.z);
+    }).listen();
+    f9.add(directionalLight, 'z', -2000, 2000, 50).onChange(function(z) {
+        directionalLight.z = z;
+        lights[2].position.set(directionalLight.x, directionalLight.y, directionalLight.z);
+    }).listen();
+    f9.addColor(directionalLight, 'color').onChange(function(color) {
+        lights[2].color.setRGB(color[0]/255.0, color[1]/255.0, color[2]/255.0);
+    }).listen();
+    directionalLight.x = lights[2].position.x;
+    directionalLight.y = lights[2].position.y;
+    directionalLight.z = lights[2].position.z;
+    directionalLight.color = [lights[2].color.r*255.0, lights[2].color.g*255.0, lights[2].color.b*255.0];
+    f9.open();
 
     var f5 = gui.addFolder('other');
-    f5.add(params, 'roamSpeed', 0, 20, 1).onChange(function(speed) {
+    f5.add(params, 'roamSpeed', 0, 50, 1).onChange(function(speed) {
         params.roamSpeed = speed;
     });
-    f5.add(params, 'zoomSpeed', 0, 20, 1).onChange(function(speed) {
+    f5.add(params, 'zoomSpeed', 0, 50, 1).onChange(function(speed) {
         params.zoomSpeed = speed;
     });
     f5.add(params, 'cameraMode', ['perspective', 'orthographic']).onFinishChange(function(mode) {
@@ -325,8 +475,6 @@ function initDatGui() {
             scene.add(axisHelper);
         }
     });
-    f5.open();
-
 }
 
 function rotateCamera(direction) {
