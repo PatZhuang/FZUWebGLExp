@@ -326,7 +326,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-			if ( scope.object instanceof THREE.PerspectiveCamera ) {
+			if ( scope.object instanceof THREE.PerspectiveCamera || scope.object instanceof THREE.CombinedCamera && scope.object.inPerspectiveMode) {
 
 				// perspective
 				var position = scope.object.position;
@@ -340,8 +340,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 				panLeft( 2 * deltaX * targetDistance / element.clientHeight, scope.object.matrix );
 				panUp( 2 * deltaY * targetDistance / element.clientHeight, scope.object.matrix );
 
-			} else if ( scope.object instanceof THREE.OrthographicCamera ) {
-
+			} else if ( scope.object instanceof THREE.OrthographicCamera || scope.object instanceof THREE.CombinedCamera && scope.object.inOrthographicMode) {
 				// orthographic
 				panLeft( deltaX * ( scope.object.right - scope.object.left ) / scope.object.zoom / element.clientWidth, scope.object.matrix );
 				panUp( deltaY * ( scope.object.top - scope.object.bottom ) / scope.object.zoom / element.clientHeight, scope.object.matrix );
@@ -360,7 +359,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function dollyIn( dollyScale ) {
 
-		if ( scope.object instanceof THREE.PerspectiveCamera ) {
+		if ( scope.object instanceof THREE.PerspectiveCamera || scope.object instanceof THREE.CombinedCamera && scope.object.inPerspectiveMode) {
 
 			scale /= dollyScale;
 
@@ -381,7 +380,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function dollyOut( dollyScale ) {
 
-		if ( scope.object instanceof THREE.PerspectiveCamera ) {
+		if ( scope.object instanceof THREE.PerspectiveCamera || scope.object instanceof THREE.CombinedCamera && scope.object.inPerspectiveMode) {
 
 			scale *= dollyScale;
 
