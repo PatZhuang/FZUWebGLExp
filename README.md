@@ -32,6 +32,7 @@ python -m SimpleHTTPServer
 
 # 二、外部 js 文件
 1. three.js
+
     three.js 项目地址：https://github.com/mrdoob/three.js
 
     three.js 更新日志：https://github.com/mrdoob/three.js/wiki/Migration-Guide
@@ -39,6 +40,7 @@ python -m SimpleHTTPServer
     如果使用更高的版本无法运行该项目，请自行查阅更新日志进行针对修改
 
 2. CombinedCamera.js
+
     用于实现组合相机（正交+透视），为 three.js 官方示例中用到的库
     ```javascript
     var camera;
@@ -55,6 +57,7 @@ python -m SimpleHTTPServer
     具体用法请参阅官方文档的 combinedCamera 部分
 
 3. OBJLoader.js / MTLLoader.js
+
     分别用于加载模型和模型材质，为 three.js 官方示例中使用到的库
     ```js
     var mtlLoader = new THREE.MTLLoader();
@@ -78,6 +81,7 @@ python -m SimpleHTTPServer
     具体用法请参阅 three.js 官方文档的 MTLLoader 和 OBJLoader 部分，或本项目中对应代码段
 
 4. OrbitControls.js
+
     球状轨道控制，为 three.js 官方示例中使用到的库
     本项目中用于支持拖拽事件、 Q/E 健响应事件和滚轮事件
     ```javascript
@@ -93,6 +97,7 @@ python -m SimpleHTTPServer
     如果需要获得最新的版本，请自行 clone three.js 源项目代码，文件在 threejs-master/examples/js/controls 目录中
 
 5. dat.gui
+
     一个轻量级的 js 变量控制库，即本项目中右侧的控制面板
 
     项目地址：https://github.com/dataarts/dat.gui
@@ -101,8 +106,9 @@ python -m SimpleHTTPServer
 
 # 三、其他
 1. 本实验中引入的茶壶模型是 MagicaVoxel 软件自带的模型。
+
     注意 WebGL 原生 API 不支持导入 3D 模型，three.js 仅支持导入 .obj 格式模型
-    
+
     由于本实验不以建模为主，因此不讨论建模相关问题，感兴趣请移步该软件项目地址：http://ephtracy.github.io
 2. 请不要用 IE11 和 chrome 18 以下的浏览器跑这个项目谢谢
 3. 没有在 FF 上测试兼容性，如果有问题请换 Chrome
