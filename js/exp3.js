@@ -16,6 +16,7 @@ var rotateOnAxis = {
     yAngle: 0.0,
     zAngle: 0.0
 };
+
 var cameraRotateDirection = 'none';
 var cameraMoveDirection = 'none';
 var currentObject;
@@ -23,6 +24,8 @@ var controls;
 var axisHelper;
 var geos = [];
 var lights = [];
+
+//用于关联 dat.gui 的参数类
 var Params = function() {
     //camera position
     this.cameraPosX = camera.position.x;
@@ -51,13 +54,16 @@ var Params = function() {
     this.cubeColor = '#ffffff';
     this.cubeTexture = 'none';
 };
-var params;
+var params; //参数类实例
+
+//关联 dat.gui 的光源颜色类
 var Light = function() {
     this.x = 0;
     this.y = 0;
     this.z = 0;
     this.color = [0, 0, 0];
 };
+//三种光源颜色实例
 var spotLight, pointLight, directionalLight;
 
 function init() {
@@ -82,6 +88,7 @@ function init() {
     //创建辅助坐标轴
     axisHelper = new THREE.AxisHelper(5000);
 
+    //这一段用于导入一个外部模型, 需要 OBJLoader.js 和 MTLLoader.js
     //加载 mtl 文件
     var mtlLoader = new THREE.MTLLoader();
     mtlLoader.setPath('model/');
@@ -97,15 +104,20 @@ function init() {
             render();
         });
     });
+
     //向场景加入随机方块 3000 个
-    var s = 50;
-    var cube = new THREE.BoxGeometry(s, s, s);
+    var size = 50;
+    var cube = new THREE.BoxGeometry(size, size, size);
     var material = new THREE.MeshPhongMaterial({
+        //初始化颜色为白色
+        //注意使用 Phong 类型材质而不是用 basic 类型
+        //basic 类型材质无法接受光源
         color: 0xffffff,
     });
-    for (var i = 0; i < 6000; i++) {
+    for (var i = 0; i < 3000; i++) {
         var mesh = new THREE.Mesh(cube, material);
         geos[i] = mesh;
+        //注意范围是以「原点」为中心, 边长为3000的立方体空间
         mesh.position.x = 3000 * (2.0 * Math.random() - 1.0);
         mesh.position.y = 3000 * (2.0 * Math.random() - 1.0);
         mesh.position.z = 3000 * (2.0 * Math.random() - 1.0);
@@ -117,21 +129,24 @@ function init() {
         scene.add(mesh);
     }
 
-    //添加全局环境光
+    //添加全局环境光，颜色是偏柔和的白色
     var ambientLight = new THREE.AmbientLight("#8b8a87", 1.2);
     scene.add(ambientLight);
 
-    // lights
+    //光源
     var lightHelpers = [];
     lights[0] = addLight(13.0/255, 174.0/255, 243.0/255, 1000, 0, -200, 'PointLight');
     lights[1] = addLight(230.0/255, 121.0/255, 26.0/255, 0, 0, -200, 'SpotLight');
     lights[2] = addLight(192.0/255, 64.0/255, 68.0/255, 1000, 1000, -200, 'DirectionalLight');
-    lightHelpers[0] = new THREE.PointLightHelper(lights[0]);
+    // lightHelpers[0] = new THREE.PointLightHelper(lights[0]);
+    // lightHelpers[1] = new THREE.SpotLightHelper(lights[1]);
+    // lightHelpers[2] = new THREE.DirectionalLightHelper(lights[2]);
     // scene.add(lightHelpers[0]);
-    lightHelpers[1] = new THREE.SpotLightHelper(lights[1]);
     // scene.add(lightHelpers[1]);
-    lightHelpers[2] = new THREE.DirectionalLightHelper(lights[2]);
     // scene.add(lightHelpers[2]);
+
+    //调用函数来添加光源的目的是方便对获得光源对象做其他操作
+    //上面注释掉的部分利用这样的处理添加了三个光源指示器
     function addLight(r, g, b, x, y, z, type) {
         var light;
         switch (type) {
@@ -156,17 +171,19 @@ function init() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0, 0); //设置中心
     controls.enableKeys = false; //由于要自己设置键盘事件所以屏蔽 controls 的事件
+
     //改变窗口大小的时候改变相机和渲染器的大小
     window.addEventListener('resize', function() {
         camera.setSize(window.innerWidth, window.innerHeight);
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     }, false);
-    //键盘响应事件
 
+    //键盘响应事件
     window.addEventListener('keydown', function(key) {
         params.cameraAutoRotate = controls.autoRotate = false;
         switch (key.keyCode) {
+            //控制镜头旋转
             case 37: //左
                 cameraRotateDirection = 'left';
                 break;
@@ -179,6 +196,7 @@ function init() {
             case 40: //下
                 cameraRotateDirection = 'down';
                 break;
+            //控制相机移动
             case 87: //W
                 cameraMoveDirection = 'up';
                 break;
@@ -191,12 +209,16 @@ function init() {
             case 68: //D
                 cameraMoveDirection = 'right';
                 break;
+            //控制相机前后移动
             case 70: //F
                 cameraMoveDirection = 'forward';
                 break;
             case 66: //B
                 cameraMoveDirection = 'back';
                 break;
+            //控制相机按照顺时针逆时针旋转
+            //这里的旋转是以原点为锥尖，绕锥底平面的旋转
+            //实际上调用的是 orbitcontrols 的 API
             case 81: //Q
                 controls.autoRotate = true;
                 controls.autoRotateSpeed = Math.abs(controls.autoRotateSpeed);
@@ -209,6 +231,7 @@ function init() {
                 break;
         }
     });
+
     //按键抬起的时候停止所有移动动作
     window.addEventListener('keyup', function() {
         cameraRotateDirection = 'none';
@@ -218,6 +241,8 @@ function init() {
     });
 
     //将渲染器对应的 dom 节点插入 html
+    //注意插入的就是一个<canvas></canvas>
+    //所以在 html 文件里面不手动写 canvas 而是用一个 div 来做父结点
     $("#WebGL").append(renderer.domElement);
     //初始化控制面板
     initDatGui();
@@ -239,6 +264,8 @@ function render() {
         }
     }
     if (controls.autoRotate) {
+        //orbitcontrols 的 autoRotate 设置为 true 时必须调用 controls.update()
+        //如果不做判断每次都直接 update 会造成卡死的情况，原因暂时不明
         controls.update();
     }
     updateCameraState();
@@ -247,6 +274,7 @@ function render() {
 }
 
 function initDatGui() {
+    //这里参考 dat.gui 的文档
     params = new Params();
     var gui = new dat.GUI();
 
@@ -463,6 +491,7 @@ function initDatGui() {
 }
 
 function rotateCamera(direction) {
+    //rotate 方法, 具体参照 three.js 文档的 object3D 对象方法
     switch (direction) {
         case 'up':
             camera.rotateX(Math.PI / 200);
@@ -482,6 +511,10 @@ function rotateCamera(direction) {
 }
 
 function updateCameraState() {
+    //在相机移动或旋转镜头时更新相机的 lookAt 向量
+    //实际上并没有 lookAt 向量这种东西, 用 getWorldDirection 获得的是一个归一化的向量
+    //这里为了好看乘了100
+    //这段代码具体解释请搜 SO 关键字 "three.js lookat vector"
     var vector = new THREE.Vector3();
     camera.getWorldDirection(vector);
     params.lookAtX = vector.x * 100;
@@ -493,6 +526,7 @@ function updateCameraState() {
 }
 
 function moveCamera(direction) {
+    //translate 方法, 具体参照 three.js 文档的 object3D 对象方法
     if (direction == 'up') {
         camera.translateY(params.roamSpeed);
     } else if (direction == 'down') {
