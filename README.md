@@ -1,8 +1,11 @@
 此项目为福州大学2016上学期图形学实践课程 实验三完整项目代码
+
 演示地址：http://123.207.227.220/uploads/webgl/exp3/exp3.html
 
 此项目基于 three.js r82 编写
+
 three.js 官方网址：https://threejs.org
+
 three.js 中文文档：http://techbrood.com/threejs/docs/
 
 ---
@@ -14,7 +17,7 @@ three.js 中文文档：http://techbrood.com/threejs/docs/
 5. 鼠标拖拽可使照相机绕以原点为中心的球做旋转
 6. 其他操作在右侧的 dat.gui 面板上
 
-该项目使用了本地纹理和模型，由于 JS 跨域调用问题，如果在本地运行该项目需要建立本地服务器
+该项目使用了本地纹理和模型，由于 JS 跨域调用问题，在本地运行该项目需要建立本地服务器
 或者直接挂自己服务器上
 
 使用 python 的 SimpleHTTPServer 模块建立本地服务器：
@@ -30,7 +33,9 @@ python -m SimpleHTTPServer
 # 二、外部 js 文件
 1. three.js
     three.js 项目地址：https://github.com/mrdoob/three.js
+
     three.js 更新日志：https://github.com/mrdoob/three.js/wiki/Migration-Guide
+
     如果使用更高的版本无法运行该项目，请自行查阅更新日志进行针对修改
 
 2. CombinedCamera.js
@@ -46,6 +51,7 @@ python -m SimpleHTTPServer
     scene.add(camera);
     ```
     如果需要获得最新的版本，请自行 clone three.js 源项目代码，文件在 threejs-master/examples/js/camera 目录中
+
     具体用法请参阅官方文档的 combinedCamera 部分
 
 3. OBJLoader.js / MTLLoader.js
@@ -68,6 +74,7 @@ python -m SimpleHTTPServer
     });
     ```
     如果需要获得最新的版本，请自行 clone three.js 源项目代码，这两个文件在 threejs-master/examples/js/loaders 目录中
+
     具体用法请参阅 three.js 官方文档的 MTLLoader 和 OBJLoader 部分，或本项目中对应代码段
 
 4. OrbitControls.js
@@ -78,18 +85,24 @@ python -m SimpleHTTPServer
     controls.target.set(0, 0, 0); //设置中心
     ```
     本程序中自己实现了键盘响应逻辑因此禁用了其自带的键盘事件
+
     ~~其实滚轮事件本来也是自己写的，但是写出来没它滑得顺畅就用它的了~~
+
     其他使用方法可以参阅 three.js 的 example 中关于 orbitControls 的示例如：https://threejs.org/examples/?q=orbit#misc_controls_orbit
+
     如果需要获得最新的版本，请自行 clone three.js 源项目代码，文件在 threejs-master/examples/js/controls 目录中
 
 5. dat.gui
     一个轻量级的 js 变量控制库，即本项目中右侧的控制面板
+
     项目地址：https://github.com/dataarts/dat.gui
+
     具体用法请参阅官方示例：http://workshop.chromeexperiments.com/examples/gui
 
 # 三、其他
 1. 本实验中引入的茶壶模型是 MagicaVoxel 软件自带的模型。
     注意 WebGL 原生 API 不支持导入 3D 模型，three.js 仅支持导入 .obj 格式模型
+    
     由于本实验不以建模为主，因此不讨论建模相关问题，感兴趣请移步该软件项目地址：http://ephtracy.github.io
 2. 请不要用 IE11 和 chrome 18 以下的浏览器跑这个项目谢谢
 3. 没有在 FF 上测试兼容性，如果有问题请换 Chrome
