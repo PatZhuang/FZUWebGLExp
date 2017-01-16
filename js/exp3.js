@@ -103,12 +103,12 @@ function init() {
     var material = new THREE.MeshPhongMaterial({
         color: 0xffffff,
     });
-    for (var i = 0; i < 2000; i++) {
+    for (var i = 0; i < 6000; i++) {
         var mesh = new THREE.Mesh(cube, material);
         geos[i] = mesh;
-        mesh.position.x = 2000 * (2.0 * Math.random() - 1.0);
-        mesh.position.y = 2000 * (2.0 * Math.random() - 1.0);
-        mesh.position.z = 2000 * (2.0 * Math.random() - 1.0);
+        mesh.position.x = 3000 * (2.0 * Math.random() - 1.0);
+        mesh.position.y = 3000 * (2.0 * Math.random() - 1.0);
+        mesh.position.z = 3000 * (2.0 * Math.random() - 1.0);
         mesh.rotation.x = Math.random() * Math.PI;
         mesh.rotation.y = Math.random() * Math.PI;
         mesh.rotation.z = Math.random() * Math.PI;
@@ -122,10 +122,16 @@ function init() {
     scene.add(ambientLight);
 
     // lights
+    var lightHelpers = [];
     lights[0] = addLight(13.0/255, 174.0/255, 243.0/255, 1000, 0, -200, 'PointLight');
     lights[1] = addLight(230.0/255, 121.0/255, 26.0/255, 0, 0, -200, 'SpotLight');
     lights[2] = addLight(192.0/255, 64.0/255, 68.0/255, 1000, 1000, -200, 'DirectionalLight');
-
+    lightHelpers[0] = new THREE.PointLightHelper(lights[0]);
+    // scene.add(lightHelpers[0]);
+    lightHelpers[1] = new THREE.SpotLightHelper(lights[1]);
+    // scene.add(lightHelpers[1]);
+    lightHelpers[2] = new THREE.DirectionalLightHelper(lights[2]);
+    // scene.add(lightHelpers[2]);
     function addLight(r, g, b, x, y, z, type) {
         var light;
         switch (type) {
@@ -150,7 +156,6 @@ function init() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0, 0); //设置中心
     controls.enableKeys = false; //由于要自己设置键盘事件所以屏蔽 controls 的事件
-
     //改变窗口大小的时候改变相机和渲染器的大小
     window.addEventListener('resize', function() {
         camera.setSize(window.innerWidth, window.innerHeight);
@@ -211,26 +216,6 @@ function init() {
         cameraRotateAroundZDirection = 'none';
         controls.autoRotate = false;
     });
-
-    //鼠标滚轮事件
-    window.onmousewheel = document.onmousewheel = function(e) {
-        e = e || window.event;
-        if (e.wheelDelta) {
-            //对于 chrome
-            if (e.wheelDelta > 0) {
-                cameraMoveDirection = 'forward';
-            } else {
-                cameraMoveDirection = 'back';
-            }
-        } else if (e.detail) {
-            //对于 ff
-            if (e.detail > 0) {
-                cameraMoveDirection = 'forward';
-            } else {
-                cameraMoveDirection = 'back';
-            }
-        }
-    };
 
     //将渲染器对应的 dom 节点插入 html
     $("#WebGL").append(renderer.domElement);
