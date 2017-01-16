@@ -91,4 +91,6 @@ python -m SimpleHTTPServer
 1. 本实验中引入的茶壶模型是 MagicaVoxel 软件自带的模型。
     注意 WebGL 原生 API 不支持导入 3D 模型，three.js 仅支持导入 .obj 格式模型
     由于本实验不以建模为主，因此不讨论建模相关问题，感兴趣请移步该软件项目地址：http://ephtracy.github.io
-2. 其实写的很烂所有如果有哪里看不懂的请给我提 issue ~~我不一定会看得到~~
+2. 请不要用 IE11 和 chrome 18 以下的浏览器跑这个项目谢谢
+3. 没有在 FF 上测试兼容性，如果有问题请换 Chrome
+4. 如果有哪里看不懂可以给我提 issue ~~我不一定会看得到~~
