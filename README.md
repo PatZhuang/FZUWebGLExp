@@ -83,6 +83,7 @@ python -m SimpleHTTPServer
 4. OrbitControls.js
 
     球状轨道控制，为 three.js 官方示例中使用到的库
+    
     本项目中用于支持拖拽事件、 Q/E 健响应事件和滚轮事件
     ```javascript
     var controls = new THREE.OrbitControls(camera, renderer.domElement);
