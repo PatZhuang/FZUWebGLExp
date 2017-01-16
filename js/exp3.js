@@ -398,7 +398,7 @@ function initDatGui() {
                 break;
         }
     });
-    f6.open();
+    // f6.open();
 
     var h, s, v, hsl;
     var f7 = gui.addFolder('point light');
@@ -421,7 +421,7 @@ function initDatGui() {
     pointLight.y = lights[0].position.y;
     pointLight.z = lights[0].position.z;
     pointLight.color = [lights[0].color.r*255.0, lights[0].color.g*255.0, lights[0].color.b*255.0];
-    f7.open();
+    // f7.open();
 
     var f8 = gui.addFolder('spot light');
     f8.add(spotLight, 'x', -2000, 2000, 50).onChange(function(x) {
@@ -443,7 +443,7 @@ function initDatGui() {
     spotLight.y = lights[1].position.y;
     spotLight.z = lights[1].position.z;
     spotLight.color = [lights[1].color.r*255.0, lights[1].color.g*255.0, lights[1].color.b*255.0];
-    f8.open();
+    // f8.open();
 
     var f9 = gui.addFolder('directional light');
     f9.add(directionalLight, 'x', -2000, 2000, 50).onChange(function(x) {
@@ -465,7 +465,7 @@ function initDatGui() {
     directionalLight.y = lights[2].position.y;
     directionalLight.z = lights[2].position.z;
     directionalLight.color = [lights[2].color.r*255.0, lights[2].color.g*255.0, lights[2].color.b*255.0];
-    f9.open();
+    // f9.open();
 
     var f5 = gui.addFolder('other');
     f5.add(params, 'roamSpeed', 0, 50, 1).onChange(function(speed) {
