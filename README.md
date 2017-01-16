@@ -92,6 +92,8 @@ python -m SimpleHTTPServer
 
     ~~其实滚轮事件本来也是自己写的，但是写出来没它滑得顺畅就用它的了~~
 
+    注意原本的库并不支持 three.js 的组合相机，我手动改了判断条件
+
     其他使用方法可以参阅 three.js 的 example 中关于 orbitControls 的示例如：https://threejs.org/examples/?q=orbit#misc_controls_orbit
 
     如果需要获得最新的版本，请自行 clone three.js 源项目代码，文件在 threejs-master/examples/js/controls 目录中
@@ -103,6 +105,10 @@ python -m SimpleHTTPServer
     项目地址：https://github.com/dataarts/dat.gui
 
     具体用法请参阅官方示例：http://workshop.chromeexperiments.com/examples/gui
+
+6. JQuery
+
+    不解释了
 
 # 三、其他
 1. 本实验中引入的茶壶模型是 MagicaVoxel 软件自带的模型。
