@@ -18,6 +18,7 @@ three.js 中文文档：http://techbrood.com/threejs/docs/
 6. 其他操作在右侧的 dat.gui 面板上
 
 该项目使用了本地纹理和模型，由于 JS 跨域调用问题，在本地运行该项目需要建立本地服务器
+
 或者直接挂自己服务器上
 
 使用 python 的 SimpleHTTPServer 模块建立本地服务器：
@@ -52,7 +53,7 @@ python -m SimpleHTTPServer
     camera.lookAt(new THREE.Vector3(lookAt.x, lookAt.y, lookAt.z));
     scene.add(camera);
     ```
-    如果需要获得最新的版本，请自行 clone three.js 源项目代码，文件在 threejs-master/examples/js/camera 目录中
+    如果需要获得最新的版本，请自行 clone three.js 源项目代码，文件在 three.js-master/examples/js/camera 目录中
 
     具体用法请参阅官方文档的 combinedCamera 部分
 
@@ -76,15 +77,15 @@ python -m SimpleHTTPServer
         });
     });
     ```
-    如果需要获得最新的版本，请自行 clone three.js 源项目代码，这两个文件在 threejs-master/examples/js/loaders 目录中
+    如果需要获得最新的版本，请自行 clone three.js 源项目代码，文件在 three.js-master/examples/js/loaders 目录中
 
-    具体用法请参阅 three.js 官方文档的 MTLLoader 和 OBJLoader 部分，或本项目中对应代码段
+    具体用法请参阅 three.js 官方文档的 MTLLoader 和 OBJLoader 部分
 
 4. OrbitControls.js
 
     球状轨道控制，为 three.js 官方示例中使用到的库
-    
-    本项目中用于支持拖拽事件、 Q/E 健响应事件和滚轮事件
+
+    本项目中用于支持拖拽事件、 Q/E 键响应事件和滚轮事件
     ```javascript
     var controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0, 0); //设置中心
@@ -97,7 +98,7 @@ python -m SimpleHTTPServer
 
     其他使用方法可以参阅 three.js 的 example 中关于 orbitControls 的示例如：https://threejs.org/examples/?q=orbit#misc_controls_orbit
 
-    如果需要获得最新的版本，请自行 clone three.js 源项目代码，文件在 threejs-master/examples/js/controls 目录中
+    如果需要获得最新的版本，请自行 clone three.js 源项目代码，文件在 three.js-master/examples/js/controls 目录中
 
 5. dat.gui
 
@@ -107,7 +108,7 @@ python -m SimpleHTTPServer
 
     具体用法请参阅官方示例：http://workshop.chromeexperiments.com/examples/gui
 
-6. JQuery
+6. jQuery
 
     不解释了
 
