@@ -1,6 +1,6 @@
 此项目为福州大学2016上学期图形学实践课程 实验三完整项目代码
 
-演示地址：http://123.207.227.220/uploads/webgl/exp3/exp3.html
+演示地址：https://patzhuang.github.io/FZUWebGLExp/exp3.html
 
 此项目基于 three.js r82 编写
 
@@ -31,7 +31,7 @@ pip install SimpleHTTPServer
 python -m SimpleHTTPServer
 #默认本地服务器地址为 0.0.0.0:8000
 ```
-具体方法和其他运行方式可以查阅《WebGL编程指南》
+其他运行方式（nodejs 等）可以查阅《WebGL编程指南》
 
 # 二、外部 js 文件
 1. three.js
